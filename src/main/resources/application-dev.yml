@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://129.204.142.57:3306/banyuan-desserts?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf-8
+    username: root
+    password: Bigdata22!
+  thymeleaf:
+    cache: false
+  redis:
+    enabled: false   # 改成 false，关闭 Redis
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.example.kechengsheji.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+
+logging:
+  level:
+    com.example.kechengsheji: DEBUG
+    com.example.kechengsheji.mapper: DEBUG

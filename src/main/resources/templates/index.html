@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智慧商品信息管理系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f0f2f5;
+            height: 100vh;
+            display: flex;
+        }
+        .sidebar {
+            width: 240px;
+            min-height: 100vh;
+            background: #1a2332;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        .sidebar-brand {
+            padding: 1.5rem 1.2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .sidebar-brand i { font-size: 1.8rem; color: #f59e0b; }
+        .sidebar-brand h1 { font-size: 1.1rem; font-weight: 600; line-height: 1.3; }
+        .sidebar-brand small { display: block; font-size: 0.65rem; font-weight: 400; color: #94a3b8; }
+        .sidebar-menu { padding: 1rem 0; flex: 1; }
+        .sidebar-menu .menu-label {
+            padding: 0.5rem 1.2rem;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: #64748b;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.7rem 1.2rem;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+        .sidebar-menu a:hover {
+            background: rgba(255,255,255,0.06);
+            color: #ffffff;
+            border-left-color: #f59e0b;
+        }
+        .sidebar-menu a.active {
+            background: rgba(255,255,255,0.08);
+            color: #ffffff;
+            border-left-color: #f59e0b;
+        }
+        .sidebar-menu a i { width: 20px; text-align: center; font-size: 1rem; color: #64748b; }
+        .sidebar-menu a:hover i, .sidebar-menu a.active i { color: #f59e0b; }
+        .sidebar-menu a .badge {
+            margin-left: auto;
+            background: #f59e0b;
+            color: #1a2332;
+            font-size: 0.65rem;
+            padding: 0.05rem 0.5rem;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+        .sidebar-menu a .lock-icon {
+            margin-left: auto;
+            color: #94a3b8;
+            font-size: 0.7rem;
+        }
+        .sidebar-footer {
+            padding: 1rem 1.2rem;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+        .sidebar-footer .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 0.3rem;
+        }
+        .sidebar-footer .user-info .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #2d3b4c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
+        .sidebar-footer .user-info .name { color: #e2e8f0; font-size: 0.85rem; font-weight: 500; }
+        .sidebar-footer .user-info .status { font-size: 0.65rem; color: #64748b; }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        .top-header {
+            background: #ffffff;
+            padding: 0.8rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .top-header .page-title { font-size: 1.2rem; font-weight: 600; color: #1e293b; }
+        .top-header .page-title span { font-weight: 400; color: #94a3b8; font-size: 0.9rem; }
+        .top-header .header-actions { display: flex; align-items: center; gap: 1rem; }
+        .top-header .header-actions .welcome { color: #64748b; font-size: 0.9rem; }
+        .top-header .header-actions .welcome strong { color: #1e293b; }
+        .top-header .header-actions .logout-btn {
+            color: #ef4444;
+            text-decoration: none;
+            font-size: 0.85rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 6px;
+            transition: 0.2s;
+        }
+        .top-header .header-actions .logout-btn:hover { background: #fef2f2; }
+        .top-header .header-actions .login-btn {
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 0.85rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 6px;
+            transition: 0.2s;
+        }
+        .top-header .header-actions .login-btn:hover { background: #eff6ff; }
+
+        .content-area {
+            flex: 1;
+            padding: 1.5rem 2rem;
+            overflow-y: auto;
+            background: #f0f2f5;
+        }
+        .iframe-wrapper {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            overflow: hidden;
+            height: calc(100vh - 160px);
+            min-height: 500px;
+        }
+        .iframe-wrapper iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* 游客提示弹窗 */
+        .toast-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 9998;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+        }
+        .toast-overlay.show { opacity: 1; pointer-events: auto; }
+
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: white;
+            padding: 2rem 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            z-index: 9999;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .toast.show { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+        .toast .icon { font-size: 3rem; color: #f59e0b; margin-bottom: 1rem; }
+        .toast h3 { color: #1e293b; font-size: 1.2rem; margin-bottom: 0.5rem; }
+        .toast p { color: #64748b; font-size: 0.9rem; margin-bottom: 1.2rem; }
+        .toast .btn-group { display: flex; gap: 0.8rem; justify-content: center; }
+        .toast .btn-group a {
+            padding: 0.5rem 1.5rem;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .toast .btn-group .btn-primary { background: #f59e0b; color: white; }
+        .toast .btn-group .btn-primary:hover { background: #d97706; }
+        .toast .btn-group .btn-secondary { background: #e2e8f0; color: #64748b; }
+        .toast .btn-group .btn-secondary:hover { background: #cbd5e1; }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 200px; }
+            .top-header { padding: 0.6rem 1rem; }
+            .content-area { padding: 0.8rem 1rem; }
+            .iframe-wrapper { height: calc(100vh - 130px); min-height: 400px; }
+        }
+        @media (max-width: 576px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; min-height: auto; position: relative; }
+            .sidebar-menu { display: flex; flex-wrap: wrap; padding: 0.3rem 0; }
+            .sidebar-menu .menu-label { display: none; }
+            .sidebar-menu a {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+                border-left: none;
+                border-bottom: 2px solid transparent;
+            }
+            .sidebar-menu a:hover, .sidebar-menu a.active {
+                border-left: none;
+                border-bottom-color: #f59e0b;
+            }
+            .sidebar-footer { display: none; }
+            .iframe-wrapper { height: calc(100vh - 200px); min-height: 300px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- 游客提示弹窗 -->
+<div class="toast-overlay" id="toastOverlay"></div>
+<div class="toast" id="toastBox">
+    <div class="icon"><i class="fas fa-lock"></i></div>
+    <h3>需要登录才能访问</h3>
+    <p>请先注册或登录后再使用此功能</p>
+    <div class="btn-group">
+        <a href="/login" class="btn-primary">去登录</a>
+        <a href="/register" class="btn-secondary">去注册</a>
+    </div>
+</div>
+
+<!-- 左侧导航 -->
+<nav class="sidebar">
+    <div class="sidebar-brand">
+        <i class="fas fa-lightbulb"></i>
+        <div>
+            <h1>智慧商品<br/>信息管理系统</h1>
+            <small>v2.0 · 管理后台</small>
+        </div>
+    </div>
+
+    <div class="sidebar-menu">
+        <div class="menu-label">主要功能</div>
+
+        <!-- 用户注册 - 所有人可见 -->
+        <a href="#" onclick="handleMenuClick('/register', this)" data-page="register" data-requires-login="false">
+            <i class="fas fa-user-plus"></i> 用户注册
+        </a>
+
+        <!-- 分类管理 - 只有管理员可见 -->
+        <a href="#" sec:authorize="hasRole('admin')"
+           onclick="handleMenuClick('/category/list', this)" data-page="category" data-requires-login="true">
+            <i class="fas fa-tags"></i> 分类管理
+            <span class="badge" id="categoryBadge">0</span>
+        </a>
+
+        <!-- 产品管理 - 只有管理员可见 -->
+        <a href="#" sec:authorize="hasRole('admin')"
+           onclick="handleMenuClick('/product/list', this)" data-page="product" data-requires-login="true">
+            <i class="fas fa-box"></i> 产品管理
+            <span class="badge" id="productBadge">0</span>
+        </a>
+
+        <!-- 数据发布 - 登录用户可见 -->
+        <a href="#" sec:authorize="isAuthenticated()"
+           onclick="handleMenuClick('/shop', this)" data-page="shop" data-requires-login="true">
+            <i class="fas fa-rocket"></i> 数据发布
+        </a>
+
+        <div class="menu-label" style="margin-top:0.5rem;">系统</div>
+
+        <!-- 系统日志 - 只有管理员可见 -->
+        <a href="#" sec:authorize="hasRole('admin')"
+           onclick="handleMenuClick('/settings', this)" data-page="settings" data-requires-login="true">
+            <i class="fas fa-history"></i> 系统日志
+        </a>
+
+        <!-- 关于系统 - 所有人可见 -->
+        <a href="#" onclick="handleMenuClick('/about', this)" data-page="about" data-requires-login="false">
+            <i class="fas fa-info-circle"></i> 关于系统
+        </a>
+    </div>
+
+    <div class="sidebar-footer">
+        <div class="user-info">
+            <div class="avatar"><i class="fas fa-user"></i></div>
+            <div>
+                <div class="name" id="usernameDisplay">游客</div>
+                <div class="status" id="userStatusDisplay">未登录</div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- 右侧主内容 -->
+<div class="main-content">
+    <header class="top-header">
+        <div class="page-title">
+            <span id="pageTitle">首页</span>
+            <span id="pageSubTitle">· 欢迎回来</span>
+        </div>
+        <div class="header-actions">
+            <span class="welcome">欢迎，<strong id="welcomeUsername">游客</strong></span>
+            <a href="/logout" class="logout-btn" id="logoutBtn" style="display:none;">
+                <i class="fas fa-sign-out-alt"></i> 退出
+            </a>
+            <a href="/login" class="login-btn" id="loginBtn">
+                <i class="fas fa-sign-in-alt"></i> 登录
+            </a>
+        </div>
+    </header>
+
+    <div class="content-area">
+        <div class="iframe-wrapper">
+            <iframe id="mainIframe" src="/welcome" frameborder="0" scrolling="auto" allowfullscreen loading="lazy">
+                您的浏览器不支持 iframe
+            </iframe>
+        </div>
+    </div>
+</div>
+
+<script>
+    let isLoggedIn = false;
+
+    function checkLoginStatus() {
+        fetch('/api/user/info')
+            .then(response => response.json())
+            .then(data => {
+                isLoggedIn = data.loggedIn;
+                updateUI(data);
+            })
+            .catch(() => { isLoggedIn = false; });
+    }
+
+    function updateUI(data) {
+        if (data.loggedIn) {
+            document.getElementById('usernameDisplay').textContent = data.username;
+            document.getElementById('userStatusDisplay').textContent = '在线';
+            document.getElementById('welcomeUsername').textContent = data.username;
+            document.getElementById('logoutBtn').style.display = 'inline';
+            document.getElementById('loginBtn').style.display = 'none';
+            document.querySelectorAll('.lock-icon').forEach(el => el.style.display = 'none');
+        } else {
+            document.getElementById('usernameDisplay').textContent = '游客';
+            document.getElementById('userStatusDisplay').textContent = '未登录';
+            document.getElementById('welcomeUsername').textContent = '游客';
+            document.getElementById('logoutBtn').style.display = 'none';
+            document.getElementById('loginBtn').style.display = 'inline';
+            document.querySelectorAll('.lock-icon').forEach(el => el.style.display = 'inline');
+        }
+    }
+
+    function handleMenuClick(url, element) {
+        const requiresLogin = element.dataset.requiresLogin === 'true';
+        if (requiresLogin && !isLoggedIn) {
+            showLoginToast();
+            return;
+        }
+        loadPage(url, element);
+    }
+
+    function showLoginToast() {
+        document.getElementById('toastBox').classList.add('show');
+        document.getElementById('toastOverlay').classList.add('show');
+    }
+
+    function hideLoginToast() {
+        document.getElementById('toastBox').classList.remove('show');
+        document.getElementById('toastOverlay').classList.remove('show');
+    }
+    document.getElementById('toastOverlay').addEventListener('click', hideLoginToast);
+
+    function loadPage(url, element) {
+        document.getElementById('mainIframe').src = url;
+        document.querySelectorAll('.sidebar-menu a').forEach(link => link.classList.remove('active'));
+        if (element) element.classList.add('active');
+
+        const pageNames = {
+            'register': '用户注册',
+            'category': '分类管理',
+            'product': '产品管理',
+            'shop': '数据发布',
+            'settings': '系统日志',
+            'about': '关于系统'
+        };
+        const pageKey = element ? element.dataset.page : 'welcome';
+        document.getElementById('pageTitle').textContent = pageNames[pageKey] || '首页';
+        document.getElementById('pageSubTitle').textContent = '· 加载中...';
+        iframe.onload = function() {
+            document.getElementById('pageSubTitle').textContent = '· 已加载';
+        };
+    }
+
+    // 获取 iframe 元素
+    const iframe = document.getElementById('mainIframe');
+
+    window.addEventListener('message', function(event) {
+        const data = event.data;
+        if (data && data.type === 'pageTitle') {
+            document.getElementById('pageTitle').textContent = data.title;
+            document.getElementById('pageSubTitle').textContent = '· ' + (data.subTitle || '');
+        }
+        if (data && data.type === 'loginStatusChanged') {
+            checkLoginStatus();
+        }
+        if (data && data.type === 'navigate') {
+            document.getElementById('mainIframe').src = data.url;
+            document.getElementById('pageTitle').textContent = data.title;
+            document.getElementById('pageSubTitle').textContent = '· ' + (data.subTitle || '');
+            document.querySelectorAll('.sidebar-menu a').forEach(link => {
+                link.classList.remove('active');
+            });
+        }
+    });
+
+    function fetchStats() {
+        fetch('/api/stats')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('categoryBadge').textContent = data.categoryCount || 0;
+                document.getElementById('productBadge').textContent = data.productCount || 0;
+            })
+            .catch(() => {});
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        checkLoginStatus();
+        fetchStats();
+        setInterval(checkLoginStatus, 10000);
+        const firstMenu = document.querySelector('.sidebar-menu a');
+        if (firstMenu) firstMenu.classList.add('active');
+    });
+</script>
+</body>
+</html>
