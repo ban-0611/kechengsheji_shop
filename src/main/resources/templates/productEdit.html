@@ -40,6 +40,19 @@
       box-shadow: 0 0 0 3px rgba(245,158,11,0.08);
     }
     .form-group textarea { resize: vertical; min-height: 80px; }
+
+    .image-preview {
+      margin-top: 0.5rem;
+      display: none;
+    }
+    .image-preview img {
+      max-width: 150px;
+      max-height: 150px;
+      border-radius: 8px;
+      border: 2px solid #e2e8f0;
+    }
+    .image-preview.show { display: block; }
+
     .form-actions { display: flex; gap: 0.8rem; margin-top: 1.5rem; }
     .btn-submit {
       background: #f59e0b; color: white; border: none;
@@ -96,7 +109,11 @@
     </div>
     <div class="form-group">
       <label>图片URL</label>
-      <input type="text" name="photoUrl" th:value="${product.photoUrl}" placeholder="请输入图片URL（可选）">
+      <input type="text" id="photoUrl" name="photoUrl" th:value="${product.photoUrl}" placeholder="请输入图片URL（可选）"
+             oninput="previewImage(this.value)">
+      <div class="image-preview" id="imagePreview" th:classappend="${product.photoUrl != null and product.photoUrl != ''} ? 'show' : ''">
+        <img id="previewImg" th:src="${product.photoUrl}" alt="图片预览">
+      </div>
     </div>
     <div class="form-actions">
       <button type="submit" class="btn-submit"><i class="fas fa-save"></i> 更新</button>
@@ -104,5 +121,41 @@
     </div>
   </form>
 </div>
+
+<script>
+  function previewImage(url) {
+    const preview = document.getElementById('imagePreview');
+    const img = document.getElementById('previewImg');
+    if (url && url.trim() !== '') {
+      img.src = url;
+      preview.style.display = 'block';
+      img.onerror = function() {
+        preview.style.display = 'none';
+      };
+      img.onload = function() {
+        preview.style.display = 'block';
+      };
+    } else {
+      preview.style.display = 'none';
+    }
+  }
+
+  // 页面加载时如果有图片，显示预览
+  document.addEventListener('DOMContentLoaded', function() {
+    const url = document.getElementById('photoUrl').value;
+    if (url && url.trim() !== '') {
+      previewImage(url);
+    }
+  });
+
+  // 通知父页面更新标题
+  if (window.parent !== window) {
+    window.parent.postMessage({
+      type: 'pageTitle',
+      title: '编辑商品',
+      subTitle: '修改商品信息'
+    }, '*');
+  }
+</script>
 </body>
 </html>

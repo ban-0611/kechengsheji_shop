@@ -40,6 +40,19 @@
             box-shadow: 0 0 0 3px rgba(245,158,11,0.08);
         }
         .form-group textarea { resize: vertical; min-height: 80px; }
+
+        /* 图片预览 */
+        .image-preview {
+            margin-top: 0.5rem;
+            display: none;
+        }
+        .image-preview img {
+            max-width: 150px;
+            max-height: 150px;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+        }
+
         .form-actions { display: flex; gap: 0.8rem; margin-top: 1.5rem; }
         .btn-submit {
             background: #1e293b; color: white; border: none;
@@ -59,46 +72,78 @@
             .form-card { padding: 1.2rem; }
             .form-actions { flex-direction: column; }
         }
-        </style>
-          </head>
-            <body>
-            <div class="form-card">
-                                  <h2><i class="fas fa-plus" style="color:#f59e0b;margin-right:0.5rem;"></i>新增商品</h2>
-                                                                                                                  <p class="subtitle">添加一个新的商品</p>
+    </style>
+</head>
+<body>
+<div class="form-card">
+    <h2><i class="fas fa-plus" style="color:#f59e0b;margin-right:0.5rem;"></i>新增商品</h2>
+    <p class="subtitle">添加一个新的商品</p>
 
-                                                                                                                                                <form th:action="@{/product/add}" method="post">
-                                                                                                                                                                                               <div class="form-group">
-                                                                                                                                                                                                                      <label>商品名称</label>
-                                                                                                                                                                                                                                   <input type="text" name="name" placeholder="请输入商品名称" required>
-                                                                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                                                                          <div class="form-group">
-                                                                                                                                                                                                                                                                                                                 <label>商品价格</label>
-                                                                                                                                                                                                                                                                                                                              <input type="number" name="price" step="0.01" placeholder="请输入商品价格" required>
-                                                                                                                                                                                                                                                                                                                                                                                                  </div>
-                                                                                                                                                                                                                                                                                                                                                                                                    <div class="form-group">
-                                                                                                                                                                                                                                                                                                                                                                                                                           <label>商品分类</label>
-                                                                                                                                                                                                                                                                                                                                                                                                                                        <select name="catId" required>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                             <option value="">请选择分类</option>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </select>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="form-group">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   <label>发布日期</label>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <input type="date" name="releaseDate" required>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <div class="form-group">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               <label>商品描述</label>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <textarea name="descp" placeholder="请输入商品描述"></textarea>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             <div class="form-group">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <label>图片URL</label>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  <input type="text" name="photoUrl" placeholder="请输入图片URL（可选）">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 <div class="form-actions">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          <button type="submit" class="btn-submit"><i class="fas fa-save"></i> 保存</button>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   <a href="/product/list" class="btn-cancel">取消</a>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </form>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </body>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          </html>
+    <form th:action="@{/product/add}" method="post">
+        <div class="form-group">
+            <label>商品名称</label>
+            <input type="text" name="name" placeholder="请输入商品名称" required>
+        </div>
+        <div class="form-group">
+            <label>商品价格</label>
+            <input type="number" name="price" step="0.01" placeholder="请输入商品价格" required>
+        </div>
+        <div class="form-group">
+            <label>商品分类</label>
+            <select name="catId" required>
+                <option value="">请选择分类</option>
+                <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>发布日期</label>
+            <input type="date" name="releaseDate" required>
+        </div>
+        <div class="form-group">
+            <label>商品描述</label>
+            <textarea name="descp" placeholder="请输入商品描述"></textarea>
+        </div>
+        <div class="form-group">
+            <label>图片URL</label>
+            <input type="text" id="photoUrl" name="photoUrl" placeholder="请输入图片URL（可选）"
+                   oninput="previewImage(this.value)">
+            <div class="image-preview" id="imagePreview">
+                <img id="previewImg" src="" alt="图片预览">
+            </div>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn-submit"><i class="fas fa-save"></i> 保存</button>
+            <a href="/product/list" class="btn-cancel">取消</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    function previewImage(url) {
+        const preview = document.getElementById('imagePreview');
+        const img = document.getElementById('previewImg');
+        if (url && url.trim() !== '') {
+            img.src = url;
+            preview.style.display = 'block';
+            img.onerror = function() {
+                preview.style.display = 'none';
+            };
+            img.onload = function() {
+                preview.style.display = 'block';
+            };
+        } else {
+            preview.style.display = 'none';
+        }
+    }
+
+    // 通知父页面更新标题
+    if (window.parent !== window) {
+        window.parent.postMessage({
+            type: 'pageTitle',
+            title: '新增商品',
+            subTitle: '添加新商品'
+        }, '*');
+    }
+</script>
+</body>
+</html>

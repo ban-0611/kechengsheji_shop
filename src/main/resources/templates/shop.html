@@ -45,7 +45,6 @@
       font-size: 0.75rem; font-weight: 600;
     }
 
-    /* ===== 搜索筛选区域 ===== */
     .search-box {
       background: #f8fafc;
       padding: 1rem 1.2rem;
@@ -89,7 +88,7 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: 1.2rem;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
     }
     .product-card {
       background: #ffffff; border: 1px solid #f1f4f9;
@@ -104,10 +103,21 @@
     }
     .product-image {
       width: 100%; aspect-ratio: 1/1;
-      background: #f0f4fe; border-radius: 16px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 2.8rem; color: #2d3b4c; margin-bottom: 0.7rem;
+      background: #f0f4fe;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.8rem;
+      color: #2d3b4c;
+      margin-bottom: 0.7rem;
       transition: 0.2s;
+      overflow: hidden;
+    }
+    .product-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
     .product-card:hover .product-image { background: #e6edfa; }
     .product-name { font-size: 0.95rem; font-weight: 600; color: #0f172a; margin-bottom: 0.2rem; line-height: 1.3; }
@@ -121,7 +131,6 @@
       line-height: 1.3; min-height: 2.2rem;
     }
     .product-price { font-size: 1.2rem; font-weight: 700; color: #0f172a; margin-bottom: 0.6rem; }
-    .product-price small { font-size: 0.7rem; font-weight: 400; color: #94a3b8; }
 
     .product-actions {
       display: flex; align-items: center; gap: 0.4rem;
@@ -155,18 +164,52 @@
     .btn-add:hover { background: #0f172a; transform: scale(1.02); }
     .btn-add:active { transform: scale(0.96); }
 
-    /* 空状态 */
     .empty-state {
       text-align: center;
       padding: 3rem 1rem;
       color: #94a3b8;
       grid-column: 1 / -1;
     }
-    .empty-state i {
-      font-size: 3rem;
-      color: #d1d5db;
-      margin-bottom: 1rem;
-      display: block;
+    .empty-state i { font-size: 3rem; color: #d1d5db; margin-bottom: 1rem; display: block; }
+
+    /* ===== 分页样式 ===== */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 0;
+      flex-wrap: wrap;
+      border-top: 1px solid #e2e8f0;
+      margin-top: 0.5rem;
+    }
+    .pagination a, .pagination span {
+      padding: 0.3rem 0.8rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: #475569;
+      text-decoration: none;
+      transition: 0.2s;
+      cursor: pointer;
+      min-width: 36px;
+      text-align: center;
+    }
+    .pagination a:hover {
+      background: #e2e8f0;
+    }
+    .pagination .active {
+      background: #1e293b;
+      color: white;
+    }
+    .pagination .disabled {
+      color: #94a3b8;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .pagination .info {
+      color: #94a3b8;
+      font-size: 0.85rem;
+      padding: 0.3rem 0.8rem;
     }
 
     .cart-footer {
@@ -175,6 +218,7 @@
       display: flex; flex-wrap: wrap; align-items: center;
       justify-content: space-between; gap: 0.8rem;
       border: 1px solid #edf2f7;
+      margin-top: 1rem;
     }
     .cart-items {
       display: flex; flex-wrap: wrap; align-items: center;
@@ -233,6 +277,8 @@
       .toast { bottom: 1rem; right: 1rem; left: 1rem; font-size: 0.8rem; padding: 0.6rem 1rem; }
       .search-box { flex-direction: column; align-items: stretch; }
       .search-box select, .search-box input { width: 100%; }
+      .pagination { gap: 0.3rem; }
+      .pagination a, .pagination span { padding: 0.2rem 0.5rem; font-size: 0.75rem; min-width: 30px; }
     }
   </style>
 </head>
@@ -247,7 +293,7 @@
     </div>
   </div>
 
-  <!-- ===== 搜索筛选区域 ===== -->
+  <!-- 搜索筛选 -->
   <div class="search-box">
     <label>分类：</label>
     <select id="categoryFilter">
@@ -263,16 +309,17 @@
     <span style="color:#94a3b8;">-</span>
     <input type="number" id="maxPriceFilter" placeholder="最高价" style="width:90px;">
 
-    <button class="search-btn" onclick="filterProducts()"><i class="fas fa-search"></i> 搜索</button>
-    <button class="reset-btn" onclick="resetFilter()"><i class="fas fa-redo"></i> 重置</button>
+    <button class="search-btn" onclick="applyFiltersAndResetPage()"><i class="fas fa-search"></i> 搜索</button>
+    <button class="reset-btn" onclick="resetFilters()"><i class="fas fa-redo"></i> 重置</button>
   </div>
 
-  <!-- ===== 商品列表 ===== -->
-  <div class="product-grid" id="productGrid">
-    <!-- 由 JavaScript 动态渲染 -->
-  </div>
+  <!-- 商品列表 -->
+  <div class="product-grid" id="productGrid"></div>
 
-  <!-- ===== 购物车底部 ===== -->
+  <!-- 分页 -->
+  <div class="pagination" id="pagination"></div>
+
+  <!-- 购物车底部 -->
   <div class="cart-footer">
     <div class="cart-items" id="cartItems">
       <span class="cart-empty"><i class="fas fa-plus-circle"></i> 添加商品到购物车</span>
@@ -286,7 +333,7 @@
 
 <script th:inline="javascript">
   // ============================================================
-  // 数据从后端获取
+  // 数据
   // ============================================================
   const allProducts = /*[[${products}]]*/ [];
   const allCategories = /*[[${categories}]]*/ [];
@@ -295,9 +342,16 @@
   let cart = [];
 
   // ============================================================
+  // 分页状态
+  // ============================================================
+  let currentPage = 1;
+  const pageSize = 5;
+
+  // ============================================================
   // DOM 引用
   // ============================================================
   const productGrid = document.getElementById('productGrid');
+  const pagination = document.getElementById('pagination');
   const cartItems = document.getElementById('cartItems');
   const cartCount = document.getElementById('cartCount');
   const totalPrice = document.getElementById('totalPrice');
@@ -326,53 +380,54 @@
   }
 
   // ============================================================
-  // 筛选商品
+  // 筛选
   // ============================================================
-  function filterProducts() {
+  function applyFilters() {
     const categoryId = document.getElementById('categoryFilter').value;
     const keyword = document.getElementById('keywordFilter').value.toLowerCase().trim();
     const minPrice = parseFloat(document.getElementById('minPriceFilter').value);
     const maxPrice = parseFloat(document.getElementById('maxPriceFilter').value);
 
     filteredProducts = allProducts.filter(product => {
-      // 分类筛选
       if (categoryId && product.catId != categoryId) return false;
-
-      // 关键词筛选
       if (keyword && !product.name.toLowerCase().includes(keyword) &&
-              !(product.descp && product.descp.toLowerCase().includes(keyword))) {
-        return false;
-      }
-
-      // 价格区间筛选
+              !(product.descp && product.descp.toLowerCase().includes(keyword))) return false;
       if (minPrice && product.price < minPrice) return false;
       if (maxPrice && product.price > maxPrice) return false;
-
       return true;
     });
-
-    renderProducts();
-    console.log(`🔍 筛选完成，共 ${filteredProducts.length} 条数据`);
   }
 
-  // ============================================================
-  // 重置筛选
-  // ============================================================
-  function resetFilter() {
+  function applyFiltersAndResetPage() {
+    applyFilters();
+    currentPage = 1;
+    render();
+  }
+
+  function resetFilters() {
     document.getElementById('categoryFilter').value = '';
     document.getElementById('keywordFilter').value = '';
     document.getElementById('minPriceFilter').value = '';
     document.getElementById('maxPriceFilter').value = '';
     filteredProducts = [...allProducts];
-    renderProducts();
-    console.log('🔄 已重置筛选，显示全部商品');
+    currentPage = 1;
+    render();
   }
 
   // ============================================================
-  // 渲染商品
+  // 渲染
   // ============================================================
+  function render() {
+    renderProducts();
+    renderPagination();
+  }
+
   function renderProducts() {
-    if (filteredProducts.length === 0) {
+    const start = (currentPage - 1) * pageSize;
+    const end = Math.min(start + pageSize, filteredProducts.length);
+    const pageProducts = filteredProducts.slice(start, end);
+
+    if (pageProducts.length === 0) {
       productGrid.innerHTML = `
                     <div class="empty-state">
                         <i class="fas fa-box-open"></i>
@@ -383,15 +438,19 @@
     }
 
     productGrid.innerHTML = '';
-    filteredProducts.forEach(product => {
+    pageProducts.forEach(product => {
+      const hasImage = product.photoUrl && product.photoUrl.trim() !== '';
       const card = document.createElement('div');
       card.className = 'product-card';
       card.dataset.id = product.id;
-      card.dataset.name = product.name;
-      card.dataset.price = product.price;
 
       card.innerHTML = `
-                    <div class="product-image"><i class="fas fa-box"></i></div>
+                    <div class="product-image">
+                        ${hasImage ?
+              `<img src="${product.photoUrl}" alt="商品图片" onerror="this.style.display='none';this.parentElement.innerHTML='<i class=\\'fas fa-box\\'></i>'">` :
+              `<i class="fas fa-box"></i>`
+      }
+                    </div>
                     <div class="product-name">${product.name}</div>
                     <span class="product-category">${getCategoryName(product.catId)}</span>
                     <div class="product-desc">${product.descp || '暂无描述'}</div>
@@ -448,7 +507,59 @@
   }
 
   // ============================================================
-  // 渲染购物车
+  // 分页
+  // ============================================================
+  function renderPagination() {
+    const total = filteredProducts.length;
+    const totalPages = Math.ceil(total / pageSize) || 1;
+
+    if (totalPages <= 1) {
+      pagination.innerHTML = '';
+      return;
+    }
+
+    let html = `<span class="info">共 ${total} 件商品</span>`;
+
+    // 首页
+    html += `<a onclick="goToPage(1)" class="${currentPage === 1 ? 'disabled' : ''}">首页</a>`;
+
+    // 上一页
+    html += `<a onclick="goToPage(${currentPage - 1})" class="${currentPage === 1 ? 'disabled' : ''}">上一页</a>`;
+
+    // 页码
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, startPage + 4);
+    if (endPage - startPage < 4) {
+      startPage = Math.max(1, endPage - 4);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      html += `<span class="${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</span>`;
+    }
+
+    // 下一页
+    html += `<a onclick="goToPage(${currentPage + 1})" class="${currentPage === totalPages ? 'disabled' : ''}">下一页</a>`;
+
+    // 尾页
+    html += `<a onclick="goToPage(${totalPages})" class="${currentPage === totalPages ? 'disabled' : ''}">尾页</a>`;
+
+    html += `<span class="info">第 ${currentPage} / ${totalPages} 页</span>`;
+
+    pagination.innerHTML = html;
+  }
+
+  function goToPage(page) {
+    const totalPages = Math.ceil(filteredProducts.length / pageSize) || 1;
+    if (page < 1 || page > totalPages) return;
+    currentPage = page;
+    renderProducts();
+    renderPagination();
+    // 滚动到顶部
+    document.querySelector('.shop-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ============================================================
+  // 购物车
   // ============================================================
   function renderCart() {
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -496,24 +607,23 @@
     showToast(`🎉 购买成功！¥${total}`, 'success');
     cart = [];
     renderCart();
-    document.querySelectorAll('.qty-value').forEach(el => el.textContent = '1');
   });
 
   // ============================================================
-  // 回车键搜索
+  // 回车搜索
   // ============================================================
   document.getElementById('keywordFilter').addEventListener('keyup', function(e) {
-    if (e.key === 'Enter') filterProducts();
+    if (e.key === 'Enter') applyFiltersAndResetPage();
   });
   document.getElementById('minPriceFilter').addEventListener('keyup', function(e) {
-    if (e.key === 'Enter') filterProducts();
+    if (e.key === 'Enter') applyFiltersAndResetPage();
   });
   document.getElementById('maxPriceFilter').addEventListener('keyup', function(e) {
-    if (e.key === 'Enter') filterProducts();
+    if (e.key === 'Enter') applyFiltersAndResetPage();
   });
 
   // ============================================================
-  // 通知父页面
+  // 初始化
   // ============================================================
   if (window.parent !== window) {
     window.parent.postMessage({
@@ -523,12 +633,8 @@
     }, '*');
   }
 
-  // ============================================================
-  // 初始化
-  // ============================================================
-  renderProducts();
+  render();
   renderCart();
-  console.log('🛍️ 数据发布页面已加载，共 ' + allProducts.length + ' 件商品');
 </script>
 </body>
 </html>
